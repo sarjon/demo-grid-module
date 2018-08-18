@@ -58,8 +58,20 @@ final class ProductQueryBuilder extends AbstractDoctrineQueryBuilder
      */
     public function getSearchQueryBuilder(SearchCriteriaInterface $searchCriteria = null)
     {
+        $quantitiesQuery = $this->connection
+            ->createQueryBuilder()
+            ->select('id_product, SUM(quantity) as quantity')
+            ->from($this->dbPrefix.'stock_available', 'sa')
+            ->groupBy('id_product');
+
         $qb = $this->getBaseQuery();
-        $qb->select('p.id_product, pl.name')
+        $qb->select('p.id_product, pl.name, q.quantity')
+            ->leftJoin(
+                'p',
+                sprintf('(%s)', $quantitiesQuery->getSQL()),
+                'q',
+                'p.id_product = q.id_product'
+            )
             ->orderBy(
                 $searchCriteria->getOrderBy(),
                 $searchCriteria->getOrderWay()

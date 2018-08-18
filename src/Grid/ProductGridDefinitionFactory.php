@@ -26,6 +26,7 @@
 
 namespace DemoGrid\Grid;
 
+use DemoGrid\Grid\Column\ProductInStockColumn;
 use PrestaShop\PrestaShop\Core\Grid\Column\ColumnCollection;
 use PrestaShop\PrestaShop\Core\Grid\Column\Type\DataColumn;
 use PrestaShop\PrestaShop\Core\Grid\Definition\Factory\AbstractGridDefinitionFactory;
@@ -67,6 +68,13 @@ final class ProductGridDefinitionFactory extends AbstractGridDefinitionFactory
                 ->setName($this->trans('Name', [], 'Modules.DemoGrid.Admin'))
                 ->setOptions([
                     'field' => 'name',
+                ])
+            )
+            ->add((new ProductInStockColumn('in_stock'))
+                ->setName($this->trans('In Stock', [], 'Modules.DemoGrid.Admin'))
+                ->setOptions([
+                    'quantity_field' => 'quantity',
+                    'with_quantity' => true,
                 ])
             )
         ;
