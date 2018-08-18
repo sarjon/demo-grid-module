@@ -49,7 +49,7 @@ class ProductController extends Controller
 
         $gridPresenter = $this->get('prestashop.core.grid.presenter.grid_presenter');
 
-        return $this->render('@Modules/demogrid/templates/admin/products.html.twig', [
+        return $this->render('@Modules/demogrid/views/admin/products.html.twig', [
             'layoutTitle' => $this->get('translator')->trans('Products', [], 'Modules.DemoGrid.Admin'),
             'productGrid' => $gridPresenter->present($productGrid),
         ]);
