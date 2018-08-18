@@ -1,0 +1,7 @@
+demogrid_admin_products:
+    path: demo-grid/products
+    methods: [GET]
+    defaults:
+        _controller: 'DemoGrid\Controller\Admin\ProductController::listingAction'
+         # small hack to make Modules active on side menu when our page is rendered
+        _legacy_controller: AdminModules

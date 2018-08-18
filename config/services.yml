@@ -1,0 +1,32 @@
+services:
+    _defaults:
+        # make all services accessible directly from container
+        public: true
+
+    # Register our grid definition factory
+    demogrid.grid.product_grid_definition_factory:
+        class: 'DemoGrid\Grid\ProductGridDefinitionFactory'
+        parent: 'prestashop.core.grid.definition.factory.abstract_grid_definition'
+        public: true
+
+    # Register our query builder
+    demogrid.grid.product_query_builder:
+        class: 'DemoGrid\Grid\ProductQueryBuilder'
+        parent: 'prestashop.core.grid.abstract_query_builder'
+        arguments:
+            - "@=service('prestashop.adapter.legacy.context').getContext().language.id"
+        public: true
+
+    # Configure grid data provider to use our query builder that we registered above
+    demogrid.grid.product_data_provider:
+        class: 'PrestaShop\PrestaShop\Core\Grid\DataProvider\DoctrineGridDataProvider'
+        arguments:
+            - '@demogrid.grid.product_query_builder'
+
+    # Configure grid factory which will use our grid definition factory and data provider services
+    demogrid.grid.product_grid_factory:
+        class: 'PrestaShop\PrestaShop\Core\Grid\GridFactory'
+        arguments:
+            - '@demogrid.grid.product_grid_definition_factory' # our grid definition factory service
+            - '@demogrid.grid.product_data_provider'           # our data provider service
+            - '@prestashop.core.grid.filter.form_factory'
