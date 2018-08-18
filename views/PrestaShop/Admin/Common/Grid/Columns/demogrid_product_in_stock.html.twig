@@ -23,16 +23,14 @@
  * International Registered Trademark & Property of PrestaShop SA
  *#}
 
-
-
 {% if record[column.options.quantity_field] > 0 %}
-  {% set badgeClass = 'badge-success' %}
+  {% set badgeClass, badgeText = 'badge-success', 'Yes'|trans({}, 'Admin.Global') %}
 {% else %}
-  {% set badgeClass = 'badge-danger' %}
+  {% set badgeClass, badgeText = 'badge-danger', 'No'|trans({}, 'Admin.Global') %}
 {% endif %}
 
 <span class="badge badge-pill {{ badgeClass }}">
-  {{ 'Yes'|trans({}, 'Admin.Global') }}
+  {{ badgeText }}
 
   {% if column.options.with_quantity %}
     ({{ record[column.options.quantity_field] }})

@@ -39,7 +39,7 @@ final class ProductInStockColumn extends AbstractColumn
      */
     public function getType()
     {
-        return 'demogrid_product_quantity';
+        return 'demogrid_product_in_stock';
     }
 
     /**
