@@ -7,3 +7,9 @@
     </div>
   </div>
 {% endblock %}
+
+{% block javascripts %}
+  {{ parent() }}
+
+  <script src="{{ asset('../modules/demogrid/public/build/admin/product/index.js') }}"></script>
+{% endblock %}

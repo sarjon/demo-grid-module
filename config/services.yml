@@ -7,6 +7,9 @@ services:
     demogrid.grid.product_grid_definition_factory:
         class: 'DemoGrid\Grid\ProductGridDefinitionFactory'
         parent: 'prestashop.core.grid.definition.factory.abstract_grid_definition'
+        arguments:
+            - "@=service('router').generate('admin_common_reset_search', {'controller': 'product', 'action': 'listing'})"
+            - "@=service('router').generate('demogrid_admin_products')"
         public: true
 
     # Register our query builder
@@ -30,3 +33,11 @@ services:
             - '@demogrid.grid.product_grid_definition_factory' # our grid definition factory service
             - '@demogrid.grid.product_data_provider'           # our data provider service
             - '@prestashop.core.grid.filter.form_factory'
+
+    # Register our custom form type
+    demogrid.form.type.yes_and_no_choice:
+        class: 'DemoGrid\Form\Type\YesAndNoChoiceType'
+        parent: 'form.type.translatable.aware'
+        tags:
+            - { name: form.type }
+        public: true

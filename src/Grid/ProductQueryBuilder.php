@@ -79,6 +79,26 @@ final class ProductQueryBuilder extends AbstractDoctrineQueryBuilder
             ->setFirstResult($searchCriteria->getOffset())
             ->setMaxResults($searchCriteria->getLimit());
 
+        foreach ($searchCriteria->getFilters() as $filterName => $filterValue) {
+            if ('in_stock' === $filterName) {
+                (bool) $filterValue ?
+                    $qb->where('q.quantity > 0') :
+                    $qb->where('q.quantity <= 0');
+
+                continue;
+            }
+
+            if ('id_product' === $filterName) {
+                $qb->andWhere("p.id_product = :$filterName");
+                $qb->setParameter($filterName, $filterValue);
+
+                continue;
+            }
+
+            $qb->andWhere("$filterName LIKE :$filterName");
+            $qb->setParameter($filterName, '%'.$filterValue.'%');
+        }
+
         return $qb;
     }
 

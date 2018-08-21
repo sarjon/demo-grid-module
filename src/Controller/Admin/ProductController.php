@@ -28,6 +28,8 @@ namespace DemoGrid\Controller\Admin;
 
 use DemoGrid\Filter\ProductFilter;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
@@ -53,5 +55,30 @@ class ProductController extends Controller
             'layoutTitle' => $this->get('translator')->trans('Products', [], 'Modules.DemoGrid.Admin'),
             'productGrid' => $gridPresenter->present($productGrid),
         ]);
+    }
+
+    /**
+     * Perform search on products list
+     *
+     * @param Request $request
+     *
+     * @return RedirectResponse
+     */
+    public function listingSearchAction(Request $request)
+    {
+        $definitionFactory = $this->get('demogrid.grid.product_grid_definition_factory');
+        $productDefinition = $definitionFactory->create();
+
+        $gridFilterFormFactory = $this->get('prestashop.core.grid.filter.form_factory');
+        $filtersForm = $gridFilterFormFactory->create($productDefinition);
+        $filtersForm->handleRequest($request);
+
+        $filters = [];
+
+        if ($filtersForm->isSubmitted()) {
+            $filters = $filtersForm->getData();
+        }
+
+        return $this->redirectToRoute('demogrid_admin_products', ['filters' => $filters]);
     }
 }

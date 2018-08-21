@@ -1,4 +1,5 @@
-{#**
+<?php
+/**
  * 2007-2018 PrestaShop
  *
  * NOTICE OF LICENSE
@@ -21,21 +22,38 @@
  * @copyright 2007-2018 PrestaShop SA
  * @license   https://opensource.org/licenses/OSL-3.0 Open Software License (OSL 3.0)
  * International Registered Trademark & Property of PrestaShop SA
- *#}
+ */
 
-{% if record[column.options.quantity_field] > 0 %}
-  {% set badgeClass, badgeText = 'badge-success', 'Yes'|trans({}, 'Admin.Global') %}
-{% else %}
-  {% set badgeClass, badgeText = 'badge-danger', 'No'|trans({}, 'Admin.Global') %}
-{% endif %}
+namespace DemoGrid\Form\Type;
 
-<p class="text-center mb-0">
-  <span class="badge badge-pill {{ badgeClass }}">
-    {{ badgeText }}
+use PrestaShopBundle\Form\Admin\Type\TranslatorAwareType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
-    {% if column.options.with_quantity %}
-      ({{ record[column.options.quantity_field] }})
-    {% endif %}
-  </span>
-</p>
+/**
+ * Class YesAndNoChoiceType from type which proves Yes/No input
+ */
+class YesAndNoChoiceType extends TranslatorAwareType
+{
+    /**
+     * {@inheritdoc}
+     */
+    public function configureOptions(OptionsResolver $resolver)
+    {
+        $resolver->setDefaults([
+            'choices' => [
+                $this->trans('Yes', 'Admin.Global') => 1,
+                $this->trans('No', 'Admin.Global') => 0,
+            ],
+            'required' => false,
+        ]);
+    }
 
+    /**
+     * {@inheritdoc}
+     */
+    public function getParent()
+    {
+        return ChoiceType::class;
+    }
+}

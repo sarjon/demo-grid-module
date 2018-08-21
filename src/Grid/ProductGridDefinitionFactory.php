@@ -26,16 +26,42 @@
 
 namespace DemoGrid\Grid;
 
+use DemoGrid\Form\Type\YesAndNoChoiceType;
 use DemoGrid\Grid\Column\ProductInStockColumn;
 use PrestaShop\PrestaShop\Core\Grid\Column\ColumnCollection;
+use PrestaShop\PrestaShop\Core\Grid\Column\Type\Common\ActionColumn;
 use PrestaShop\PrestaShop\Core\Grid\Column\Type\DataColumn;
 use PrestaShop\PrestaShop\Core\Grid\Definition\Factory\AbstractGridDefinitionFactory;
+use PrestaShop\PrestaShop\Core\Grid\Filter\Filter;
+use PrestaShop\PrestaShop\Core\Grid\Filter\FilterCollection;
+use PrestaShopBundle\Form\Admin\Type\SearchAndResetType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 
 /**
  * Class ProductGridDefinitionFactory creates definition for our products grid
  */
 final class ProductGridDefinitionFactory extends AbstractGridDefinitionFactory
 {
+    /**
+     * @var string
+     */
+    private $resetFiltersUrl;
+
+    /**
+     * @var string
+     */
+    private $redirectUrl;
+
+    /**
+     * @param string $resetFiltersUrl
+     * @param string $redirectUrl
+     */
+    public function __construct($resetFiltersUrl, $redirectUrl)
+    {
+        $this->resetFiltersUrl = $resetFiltersUrl;
+        $this->redirectUrl = $redirectUrl;
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -58,7 +84,7 @@ final class ProductGridDefinitionFactory extends AbstractGridDefinitionFactory
     protected function getColumns()
     {
         return (new ColumnCollection())
-            ->add((new DataColumn('id'))
+            ->add((new DataColumn('id_product'))
                 ->setName($this->trans('ID', [], 'Modules.DemoGrid.Admin'))
                 ->setOptions([
                     'field' => 'id_product',
@@ -76,6 +102,42 @@ final class ProductGridDefinitionFactory extends AbstractGridDefinitionFactory
                     'quantity_field' => 'quantity',
                     'with_quantity' => true,
                 ])
+            )
+            ->add((new ActionColumn('actions'))
+                ->setName($this->trans('Actions', [], 'Admin.Actions'))
+            )
+        ;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getFilters()
+    {
+        return (new FilterCollection())
+            ->add((new Filter('id_product', TextType::class))
+                ->setTypeOptions([
+                    'required' => false,
+                ])
+                ->setAssociatedColumn('id_product')
+            )
+            ->add((new Filter('name', TextType::class))
+                ->setTypeOptions([
+                    'required' => false,
+                ])
+                ->setAssociatedColumn('name')
+            )
+            ->add((new Filter('in_stock', YesAndNoChoiceType::class))
+                ->setAssociatedColumn('in_stock')
+            )
+            ->add((new Filter('actions', SearchAndResetType::class))
+                ->setTypeOptions([
+                    'attr' => [
+                        'data-url' => $this->resetFiltersUrl,
+                        'data-redirect' => $this->redirectUrl,
+                    ],
+                ])
+                ->setAssociatedColumn('actions')
             )
         ;
     }
