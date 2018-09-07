@@ -32,7 +32,7 @@ use PrestaShop\PrestaShop\Core\Grid\Query\AbstractDoctrineQueryBuilder;
 use PrestaShop\PrestaShop\Core\Grid\Search\SearchCriteriaInterface;
 
 /**
- * Class ProductQueryBuilder builds queries for our grid data provider
+ * Class ProductQueryBuilder builds queries for our grid data factory
  */
 final class ProductQueryBuilder extends AbstractDoctrineQueryBuilder
 {
@@ -42,21 +42,28 @@ final class ProductQueryBuilder extends AbstractDoctrineQueryBuilder
     private $contextLangId;
 
     /**
+     * @var int
+     */
+    private $contextShopId;
+
+    /**
      * @param Connection $connection
      * @param string $dbPrefix
      * @param int $contextLangId
+     * @param int $contextShopId
      */
-    public function __construct(Connection $connection, $dbPrefix, $contextLangId)
+    public function __construct(Connection $connection, $dbPrefix, $contextLangId, $contextShopId)
     {
         parent::__construct($connection, $dbPrefix);
 
         $this->contextLangId = $contextLangId;
+        $this->contextShopId = $contextShopId;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getSearchQueryBuilder(SearchCriteriaInterface $searchCriteria = null)
+    public function getSearchQueryBuilder(SearchCriteriaInterface $searchCriteria)
     {
         $quantitiesQuery = $this->connection
             ->createQueryBuilder()
@@ -72,6 +79,13 @@ final class ProductQueryBuilder extends AbstractDoctrineQueryBuilder
                 'q',
                 'p.id_product = q.id_product'
             )
+            ->leftJoin(
+                'p',
+                $this->dbPrefix . 'product_shop',
+                'ps',
+                'ps.id_product = p.id_product AND ps.id_shop = :context_shop_id'
+            )
+            ->setParameter('context_shop_id', $this->contextShopId)
             ->orderBy(
                 $searchCriteria->getOrderBy(),
                 $searchCriteria->getOrderWay()
@@ -105,7 +119,7 @@ final class ProductQueryBuilder extends AbstractDoctrineQueryBuilder
     /**
      * {@inheritdoc}
      */
-    public function getCountQueryBuilder(SearchCriteriaInterface $searchCriteria = null)
+    public function getCountQueryBuilder(SearchCriteriaInterface $searchCriteria)
     {
         $qb = $this->getBaseQuery();
         $qb->select('COUNT(p.id_product)');
@@ -123,8 +137,14 @@ final class ProductQueryBuilder extends AbstractDoctrineQueryBuilder
         return $this->connection
             ->createQueryBuilder()
             ->from($this->dbPrefix.'product', 'p')
-            ->leftJoin('p', $this->dbPrefix.'product_lang', 'pl', 'p.id_product = pl.id_product')
-            ->andWhere('pl.id_lang = :id_lang')
-            ->setParameter('id_lang', $this->contextLangId);
+            ->leftJoin(
+                'p',
+                $this->dbPrefix.'product_lang',
+                'pl',
+                'p.id_product = pl.id_product AND pl.id_lang = :context_lang_id AND pl.id_shop = :context_shop_id'
+            )
+            ->setParameter('context_lang_id', $this->contextLangId)
+            ->setParameter('context_shop_id', $this->contextShopId)
+        ;
     }
 }

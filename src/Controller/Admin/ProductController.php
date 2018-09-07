@@ -67,7 +67,7 @@ class ProductController extends Controller
     public function listingSearchAction(Request $request)
     {
         $definitionFactory = $this->get('demogrid.grid.product_grid_definition_factory');
-        $productDefinition = $definitionFactory->create();
+        $productDefinition = $definitionFactory->getDefinition();
 
         $gridFilterFormFactory = $this->get('prestashop.core.grid.filter.form_factory');
         $filtersForm = $gridFilterFormFactory->create($productDefinition);

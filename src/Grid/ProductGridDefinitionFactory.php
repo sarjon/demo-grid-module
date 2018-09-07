@@ -28,6 +28,10 @@ namespace DemoGrid\Grid;
 
 use DemoGrid\Form\Type\YesAndNoChoiceType;
 use DemoGrid\Grid\Column\ProductInStockColumn;
+use PrestaShop\PrestaShop\Core\Grid\Action\GridActionCollection;
+use PrestaShop\PrestaShop\Core\Grid\Action\Row\RowActionCollection;
+use PrestaShop\PrestaShop\Core\Grid\Action\Row\Type\LinkRowAction;
+use PrestaShop\PrestaShop\Core\Grid\Action\Type\SimpleGridAction;
 use PrestaShop\PrestaShop\Core\Grid\Column\ColumnCollection;
 use PrestaShop\PrestaShop\Core\Grid\Column\Type\Common\ActionColumn;
 use PrestaShop\PrestaShop\Core\Grid\Column\Type\DataColumn;
@@ -105,14 +109,20 @@ final class ProductGridDefinitionFactory extends AbstractGridDefinitionFactory
             )
             ->add((new ActionColumn('actions'))
                 ->setName($this->trans('Actions', [], 'Admin.Actions'))
+                ->setOptions([
+                    'actions' => $this->getRowActions(),
+                ])
             )
         ;
     }
 
     /**
      * {@inheritdoc}
+     *
+     * Define filters and associate them with columns.
+     * Note that you can add filters that are not associated with any column.
      */
-    public function getFilters()
+    protected function getFilters()
     {
         return (new FilterCollection())
             ->add((new Filter('id_product', TextType::class))
@@ -138,6 +148,47 @@ final class ProductGridDefinitionFactory extends AbstractGridDefinitionFactory
                     ],
                 ])
                 ->setAssociatedColumn('actions')
+            )
+        ;
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * Here we define what actions our products grid will have.
+     */
+    protected function getGridActions()
+    {
+        return (new GridActionCollection())
+            ->add((new SimpleGridAction('common_refresh_list'))
+                ->setName($this->trans('Refresh list', [], 'Admin.Advparameters.Feature'))
+                ->setIcon('refresh')
+            )
+            ->add((new SimpleGridAction('common_show_query'))
+                ->setName($this->trans('Show SQL query', [], 'Admin.Actions'))
+                ->setIcon('code')
+            )
+            ->add((new SimpleGridAction('common_export_sql_manager'))
+                ->setName($this->trans('Export to SQL Manager', [], 'Admin.Actions'))
+                ->setIcon('storage')
+            )
+        ;
+    }
+
+    /**
+     * Extracted row action definition into separate method.
+     */
+    private function getRowActions()
+    {
+        return (new RowActionCollection())
+            ->add((new LinkRowAction('edit'))
+                ->setName($this->trans('Edit', [], 'Admin.Actions'))
+                ->setOptions([
+                    'route' => 'admin_product_form',
+                    'route_param_name' => 'id',
+                    'route_param_field' => 'id_product',
+                ])
+                ->setIcon('edit')
             )
         ;
     }
