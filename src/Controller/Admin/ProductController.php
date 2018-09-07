@@ -47,7 +47,7 @@ class ProductController extends Controller
     public function listingAction(ProductFilter $filters)
     {
         $productGridFactory = $this->get('demogrid.grid.product_grid_factory');
-        $productGrid = $productGridFactory->createUsingSearchCriteria($filters);
+        $productGrid = $productGridFactory->getGrid($filters);
 
         $gridPresenter = $this->get('prestashop.core.grid.presenter.grid_presenter');
 

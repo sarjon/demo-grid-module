@@ -22,9 +22,12 @@ services:
 
     # Configure grid data provider to use our query builder that we registered above
     demogrid.grid.product_data_provider:
-        class: 'PrestaShop\PrestaShop\Core\Grid\DataProvider\DoctrineGridDataProvider'
+        class: 'PrestaShop\PrestaShop\Core\Grid\Data\Factory\DoctrineGridDataFactory'
         arguments:
             - '@demogrid.grid.product_query_builder'
+            - '@prestashop.core.hook.dispatcher'
+            - 'demogrid_products' # this should match your grid id
+                                  # although you can implement your own data if needed
 
     # Configure grid factory which will use our grid definition factory and data provider services
     demogrid.grid.product_grid_factory:
