@@ -22,20 +22,20 @@ services:
         public: true
 
     # Configure grid data provider to use our query builder that we registered above
-    demogrid.grid.product_data_provider:
+    demogrid.grid.product_data_factory:
         class: 'PrestaShop\PrestaShop\Core\Grid\Data\Factory\DoctrineGridDataFactory'
         arguments:
             - '@demogrid.grid.product_query_builder'
             - '@prestashop.core.hook.dispatcher'
-            - 'demogrid_products' # this should match your grid id
-                                  # although you can implement your own data if needed
+            - '@prestashop.core.grid.query.doctrine_query_parser'
+            - 'demogrid_products'
 
     # Configure grid factory which will use our grid definition factory and data provider services
     demogrid.grid.product_grid_factory:
         class: 'PrestaShop\PrestaShop\Core\Grid\GridFactory'
         arguments:
             - '@demogrid.grid.product_grid_definition_factory' # our grid definition factory service
-            - '@demogrid.grid.product_data_provider'           # our data provider service
+            - '@demogrid.grid.product_data_factory'           # our data provider service
             - '@prestashop.core.grid.filter.form_factory'
 
     # Register our custom form type
